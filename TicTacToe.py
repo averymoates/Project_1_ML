@@ -15,8 +15,10 @@ class TicTacToe:
 
     current_player = -1
 
-    def __init__(self):
-        self.board = np.zeros(self.BOARD_SIZE*self.BOARD_SIZE)
+    state_value = 0b111111111000000000
+
+    def __init__(self, board = np.array([0,0,0,0,0,0,0,0,0])):
+        self.board = board
 
     def make_move(self,placement,player):
         if self.game_started == False:
@@ -194,9 +196,20 @@ class TicTacToe:
         elif game_status == 3:
             print('Game ended in a tie')
 
-    def get_stateSpace(self):
-        return False
-        #Need to work on this function
+    def cal_state_space(self):
+        temp_value = 0
+
+        for i in range(0,self.BOARD_SIZE*self.BOARD_SIZE):
+            if self.board[i] == 0:
+                temp_value = (0b1 << i) | temp_value
+
+            elif self.board[i] == 2:
+                temp_value = (0b1 << i + 9) | temp_value
+
+        self.state_value = temp_value
+
+    def get_state_space(self):
+        return self.state_value
     
     def get_action_used(self):
         return False
