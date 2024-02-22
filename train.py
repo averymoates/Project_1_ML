@@ -1,4 +1,5 @@
 import TicTacToe as TTT
+import sys
 
 def main():
     game = TTT.TicTacToe()
@@ -10,14 +11,17 @@ def main():
 
     print(game.get_game_status())
 
-    while game.get_game_status() == True:
-        game.play_turn()
-        game.cal_state_space()
-        print(game.get_state_space())
+    current_player = game.get_current_player()
 
-    print("Copied board:")
-    print(copyGame.display_board())
+    game.make_move(1,current_player)
 
+    game.display_board()
+
+    game.unmake_move(1,current_player)
+
+    game.display_board()
+
+    print(sys.maxsize)
 
 if __name__ == '__main__':
     main()
