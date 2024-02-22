@@ -22,13 +22,13 @@ class TicTacToe:
         self.current_player = currentplayer
         self.game_started = game_started
 
-    def make_move(self,placement,player):
+    def make_move(self,placement: int, player: int):
         if self.game_started == False:
             print('Tic Tac Toe has not started')
             return False
 
         # Return false if the placement is not 0,1,2,3,4,5,6,7,8
-        if placement <0 or placement >= 9:
+        if (placement < 0) or (placement >= 9):
             print('Wrong placement value')
             return False
         
@@ -50,7 +50,7 @@ class TicTacToe:
         # Return false if the placement is not legal
         return False
 
-    def unmake_move(self,placement,player):
+    def unmake_move(self,placement: int, player: int):
         if placement<0 or placement>=9:
             print('Wrong placement value')
             return False
@@ -64,10 +64,12 @@ class TicTacToe:
             if player == 1 and self.current_player == 2:
                 self.board[placement] = 0
                 self.current_player = player
+                self.game_started = True
 
             elif player == 2 and self.current_player == 1:
                 self.board[placement] = 0
                 self.current_player = player
+                self.game_started = True
 
             else:
                 print('Something went wrong')
@@ -79,7 +81,7 @@ class TicTacToe:
             print('Can not unmake that move.')
             return False
 
-    def check_move(self,placement):
+    def check_move(self,placement: int):
         # Return true if the placement is empty
         if self.board[placement] == 0:
             return True
@@ -88,7 +90,7 @@ class TicTacToe:
         return False
     
     #To check if a placement is empty
-    def is_empty(self, placement):
+    def is_empty(self, placement: int):
         if placement<0 and placement>=9:
             print("Wrong placement value")
             return False
@@ -98,10 +100,8 @@ class TicTacToe:
         else:
             return False
 
-        
-
     # 1 - player one wins, 2 - player two wins, 3 - tie, 0 - can still play
-    def check_board(self):
+    def check_board(self) -> int:
         # Player one wins
         if self.board[0] == self.PLAYER_ONE and self.board[1] == self.PLAYER_ONE and self.board[2] == self.PLAYER_ONE:
             self.game_started = False
@@ -162,7 +162,7 @@ class TicTacToe:
         # Still empty slots
         return 0
 
-    def display_board(self):
+    def display_board(self) -> None:
         if self.board.size != 9:
             print("Wrong board size")
 
@@ -172,37 +172,8 @@ class TicTacToe:
             print(self.board[6:9]) 
             print('')  
 
-    def get_current_player(self):
+    def get_current_player(self) -> int:
         return self.current_player
-
-    # def player_one_turn(self,placement):
-    #     if self.current_player != 1:
-    #         print("Wrong player.")
-    #         return False
-        
-    #     if self.make_move(placement,self.PLAYER_ONE):
-    #         self.display_board()
-    #         self.current_player = 2
-    #         return True
-
-    #     else:
-    #         print("Please try again player {0}".format(self.PLAYER_ONE))
-    #         return False
-
-        
-    # def player_two_turn(self,placement):
-    #     if self.current_player != 2:
-    #         print("Wrong player.")
-    #         return False
-        
-    #     if self.make_move(placement,self.PLAYER_TWO):
-    #         self.display_board()
-    #         self.current_player = 1
-    #         return True
-
-    #     else:
-    #         print("Please try again player {0}".format(self.PLAYER_TWO))
-    #         return False
 
     def get_board(self):
         return copy.deepcopy(self.board)
@@ -215,45 +186,6 @@ class TicTacToe:
 
     def get_game_status(self):
         return self.game_started
-
-    # def play_turn(self, move=-1):
-    #     print('Player {0}, please type in your move'.format(self.current_player))
-
-    #     placement_value = input()
-
-    #     while True:
-    #         if placement_value.isdigit() == False:
-    #             print('Wrong value for placement. Please try again player {0}'.format(self.current_player))
-    #             placement_value = input()
-    #             continue
-
-    #         else:
-    #             placement_value = int(placement_value)
-
-    #         if isinstance(placement_value, int):
-    #             if self.current_player == self.PLAYER_ONE:
-    #                 if self.player_one_turn(placement_value):
-    #                     break
-    #                 else:
-    #                     placement_value = input()
-
-    #             elif self.current_player == self.PLAYER_TWO:
-    #                 if self.player_two_turn(placement_value):
-    #                     break
-    #                 else:
-    #                     placement_value = input()
-
-    #         else:
-    #             print('Wrong value for placement. Please try again player {0}'.format(self.current_player))
-    #             placement_value = input()
-
-    #     game_status = self.check_board()
-
-    #     if game_status == 1 or game_status == 2:
-    #         print('Player {0} has won!'.format(game_status))
-
-    #     elif game_status == 3:
-    #         print('Game ended in a tie')
 
     def cal_state_space(self):
         temp_value = 0

@@ -1,10 +1,13 @@
 import TicTacToe as TTT
 import sys
 
+from alphabeta import alphabeta
+
 def main():
     game = TTT.TicTacToe()
 
     copyGame = TTT.TicTacToe(board=game.get_board())
+    otherPlayer = alphabeta()
 
     game.display_board()
     game.start_game()
@@ -13,15 +16,24 @@ def main():
 
     current_player = game.get_current_player()
 
-    game.make_move(1,current_player)
+    print(current_player)
 
-    game.display_board()
+    moves = [2,5,8]
+    while(game.get_game_status()):
+        if current_player == 1:
+            placement = otherPlayer.alphabeta_make_move(game.get_board(),10,1)
+            game.make_move(placement,1)
+            current_player = game.get_current_player()
+            game.display_board()
 
-    game.unmake_move(1,current_player)
+        elif current_player == 2:
+            print('Player 2, enter your move:')
+            placement = int(input())
+            game.make_move(placement,2)
+            current_player = game.get_current_player()
+            game.display_board()
 
-    game.display_board()
-
-    print(sys.maxsize)
+        game.check_board()
 
 if __name__ == '__main__':
     main()
