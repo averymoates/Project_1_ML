@@ -6,7 +6,9 @@ import numpy as np
 Author: Avery Moates
 Date: 2/23/2024
 
-Simple tic tac toe game
+Alpha beta prunning algorithm for tic tac toe
+
+player == 1
 
 """
 
@@ -103,7 +105,7 @@ class alphabeta:
         Returns:
             int: _description_
         """
-        if TTTgame.check_board() != 0 or depth > self.max_depth:
+        if TTTgame.check_board() != 0 or depth > self.__max_depth:
             return self.evaluate_game(TTTgame,maxPlayer,minPlayer)
         
         if isMax == True:
