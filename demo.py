@@ -6,7 +6,6 @@ from alphabeta import alphabeta
 def main():
     game = TTT.TicTacToe()
 
-    copyGame = TTT.TicTacToe(board=game.get_board())
     otherPlayer = alphabeta()
 
     game.display_board()

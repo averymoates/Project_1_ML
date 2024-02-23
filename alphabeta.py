@@ -2,17 +2,34 @@ from TicTacToe import TicTacToe
 import sys
 import numpy as np
 
+"""
+Author: Avery Moates
+Date: 2/23/2024
+
+Simple tic tac toe game
+
+"""
 
 class alphabeta:
 
-    #Constructor function
     def __init__(self):
-        self.game = TicTacToe()
-        self.max_depth = 3
+        """Constructor
+        """
+        self.__game = TicTacToe()
+        self.__max_depth = 3
 
-    #Function to return a value of 0-8
-    def alphabeta_make_move(self, board, depth, player: int) -> int:
-        self.max_depth = depth
+    def alphabeta_make_move(self, board, depth: int, player: int) -> int:
+        """Function to make a decision on a value of 0-8 using the Alpha-beta algorithm
+
+        Args:
+            board (int[9] array): Array to describe the placement of a Tic Tac Toe game
+            depth (int): The max depth you want the Alpha-Beta algorithm to calculate 
+            player (int): Who the max player is in Tic Tac Toe
+
+        Returns:
+            int: int value between 0-8 
+        """
+        self.__max_depth = depth
         #Setting everything up so that alpha beta works
         game = TicTacToe(board=board,currentplayer=player,game_started=True)
         maxPlayer = game.get_current_player()
@@ -36,6 +53,18 @@ class alphabeta:
         return self.init_alphabeta(game,alpha,beta,maxPlayer,minPlayer)
     
     def init_alphabeta(self, TTTgame: TicTacToe, alpha: int, beta: int, maxPlayer: int, minPlayer: int) -> int:
+        """The start of the Alpha-Beta algorithm
+
+        Args:
+            TTTgame (TicTacToe): _description_
+            alpha (int): _description_
+            beta (int): _description_
+            maxPlayer (int): _description_
+            minPlayer (int): _description_
+
+        Returns:
+            int: _description_
+        """
         value = -100_000_000_000
         best_move = -1
 
@@ -60,6 +89,20 @@ class alphabeta:
         return best_move
     
     def alphabeta(self, TTTgame: TicTacToe, depth: int, alpha: int, beta: int, isMax: bool, maxPlayer: int, minPlayer: int) -> int:
+        """Recursive function of the alpha-beta algorithm
+
+        Args:
+            TTTgame (TicTacToe): _description_
+            depth (int): _description_
+            alpha (int): _description_
+            beta (int): _description_
+            isMax (bool): _description_
+            maxPlayer (int): _description_
+            minPlayer (int): _description_
+
+        Returns:
+            int: _description_
+        """
         if TTTgame.check_board() != 0 or depth > self.max_depth:
             return self.evaluate_game(TTTgame,maxPlayer,minPlayer)
         
@@ -96,6 +139,16 @@ class alphabeta:
             return min_value
 
     def evaluate_game(self, TTTgame: TicTacToe, maxPlayer: int, minPlayer: int) -> int:
+        """Function to calculate the score of the board. 0 if the board has no winner, a 1 for max player winning and additional 1 for each empty space, and a -1 for min player winning and additional -1 for each empty space
+
+        Args:
+            TTTgame (TicTacToe): _description_
+            maxPlayer (int): _description_
+            minPlayer (int): _description_
+
+        Returns:
+            int: _description_
+        """
         winner = TTTgame.check_board()
 
         if winner == maxPlayer:
