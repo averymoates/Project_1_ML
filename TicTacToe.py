@@ -2,28 +2,50 @@ import numpy as np
 from random import randint
 import copy
 
+"""
+Author: Avery Moates
+Date: 2/23/2024
+
+Simple tic tac toe game
+
+"""
+
 class TicTacToe:
 
-    BOARD_SIZE = 3
+    __board_size = 3
 
-    board = 0
+    __player_one = 1
+    __player_two = 2
 
-    PLAYER_ONE = 1
-    PLAYER_TWO = 2
+    __game_started = False
 
-    game_started = False
+    __current_player = -1
 
-    current_player = -1
-
-    state_value = 0b111111111000000000
+    __state_value = 0b111111111000000000
 
     def __init__(self, board = np.array([0,0,0,0,0,0,0,0,0]), currentplayer=-1, game_started=False):
-        self.board = board
-        self.current_player = currentplayer
-        self.game_started = game_started
+        """Constructor function
 
-    def make_move(self,placement: int, player: int):
-        if self.game_started == False:
+        Args:
+            board (int[9], optional): _description_. Defaults to np.array([0,0,0,0,0,0,0,0,0]).
+            currentplayer (int, optional): _description_. Defaults to -1.
+            game_started (bool, optional): _description_. Defaults to False.
+        """
+        self.__board = board
+        self.__current_player = currentplayer
+        self.__game_started = game_started
+
+    def make_move(self,placement: int, player: int) -> bool:
+        """Function to make a move for a certain player
+
+        Args:
+            placement (int): Index value
+            player (int): Player
+
+        Returns:
+            bool: True if the the move was legal. False if the move was illegal
+        """
+        if self.__game_started == False:
             print('Tic Tac Toe has not started')
             return False
 
@@ -32,44 +54,53 @@ class TicTacToe:
             print('Wrong placement value')
             return False
         
-        if player != self.current_player:
+        if player != self.__current_player:
             print('Wrong player')
             return False
 
         # Return true if the placement is legal
         if self.check_move(placement):
-            self.board[placement] = player
+            self.__board[placement] = player
             if player==1:
-                self.current_player = 2
+                self.__current_player = 2
 
             elif player==2:
-                self.current_player = 1
+                self.__current_player = 1
 
             return True
         
         # Return false if the placement is not legal
         return False
 
-    def unmake_move(self,placement: int, player: int):
+    def unmake_move(self,placement: int, player: int) -> bool:
+        """Function to unmake a move for a certain player. NOTE: you can only unmake a move for the player that just make a move. Be carefull using this function
+
+        Args:
+            placement (int): Index value
+            player (int): Player
+
+        Returns:
+            bool: True if the action was legal. False if the action was illegal
+        """
         if placement<0 or placement>=9:
             print('Wrong placement value')
             return False
         
-        if self.current_player == player:
+        if self.__current_player == player:
             print('Current player can not numake move')
             return False
         
-        if self.board[placement] == player:
+        if self.__board[placement] == player:
             
-            if player == 1 and self.current_player == 2:
-                self.board[placement] = 0
-                self.current_player = player
-                self.game_started = True
+            if player == 1 and self.__current_player == 2:
+                self.__board[placement] = 0
+                self.__current_player = player
+                self.__game_started = True
 
-            elif player == 2 and self.current_player == 1:
-                self.board[placement] = 0
-                self.current_player = player
-                self.game_started = True
+            elif player == 2 and self.__current_player == 1:
+                self.__board[placement] = 0
+                self.__current_player = player
+                self.__game_started = True
 
             else:
                 print('Something went wrong')
@@ -81,126 +112,172 @@ class TicTacToe:
             print('Can not unmake that move.')
             return False
 
-    def check_move(self,placement: int):
+    def check_move(self,placement: int) -> bool:
+        """Function to check if a move is legal or not
+
+        Args:
+            placement (int): Index value
+
+        Returns:
+            bool: True if the action was legal. False if the action was illegal
+        """
         # Return true if the placement is empty
-        if self.board[placement] == 0:
+        if self.__board[placement] == 0:
             return True
         
         # Return false if the placement is not empty
         return False
     
     #To check if a placement is empty
-    def is_empty(self, placement: int):
+    def is_empty(self, placement: int) -> bool:
+        """To check if a index value is empty or a value of 0
+
+        Args:
+            placement (int): Index value
+
+        Returns:
+            bool: True if the value in placement index is 0, false if not
+        """
         if placement<0 and placement>=9:
             print("Wrong placement value")
             return False
         
-        if self.board[placement] == 0:
+        if self.__board[placement] == 0:
             return True
         else:
             return False
 
-    # 1 - player one wins, 2 - player two wins, 3 - tie, 0 - can still play
     def check_board(self) -> int:
+        """Function to check if there is a winner to Tic Tac Toe.
+
+        Returns:
+            int: 1 - player one wins, 2 - player two wins, 3 - tie, 0 - can still play
+        """
         # Player one wins
-        if self.board[0] == self.PLAYER_ONE and self.board[1] == self.PLAYER_ONE and self.board[2] == self.PLAYER_ONE:
-            self.game_started = False
-            return self.PLAYER_ONE
-        elif self.board[3] == self.PLAYER_ONE and self.board[4] == self.PLAYER_ONE and self.board[5] == self.PLAYER_ONE:
-            self.game_started = False
-            return self.PLAYER_ONE
-        elif self.board[6] == self.PLAYER_ONE and self.board[7] == self.PLAYER_ONE and self.board[8] == self.PLAYER_ONE:
-            self.game_started = False
-            return self.PLAYER_ONE
-        elif self.board[0] == self.PLAYER_ONE and self.board[3] == self.PLAYER_ONE and self.board[6] == self.PLAYER_ONE:
-            self.game_started = False
-            return self.PLAYER_ONE
-        elif self.board[1] == self.PLAYER_ONE and self.board[4] == self.PLAYER_ONE and self.board[7] == self.PLAYER_ONE:
-            self.game_started = False
-            return self.PLAYER_ONE
-        elif self.board[2] == self.PLAYER_ONE and self.board[5] == self.PLAYER_ONE and self.board[8] == self.PLAYER_ONE:
-            self.game_started = False
-            return self.PLAYER_ONE
-        elif self.board[0] == self.PLAYER_ONE and self.board[4] == self.PLAYER_ONE and self.board[8] == self.PLAYER_ONE:
-            self.game_started = False
-            return self.PLAYER_ONE
-        elif self.board[2] == self.PLAYER_ONE and self.board[4] == self.PLAYER_ONE and self.board[6] == self.PLAYER_ONE:
-            self.game_started = False
-            return self.PLAYER_ONE
+        if self.__board[0] == self.__player_one and self.__board[1] == self.__player_one and self.__board[2] == self.__player_one:
+            self.__game_started = False
+            return self.__player_one
+        elif self.__board[3] == self.__player_one and self.__board[4] == self.__player_one and self.__board[5] == self.__player_one:
+            self.__game_started = False
+            return self.__player_one
+        elif self.__board[6] == self.__player_one and self.__board[7] == self.__player_one and self.__board[8] == self.__player_one:
+            self.__game_started = False
+            return self.__player_one
+        elif self.__board[0] == self.__player_one and self.__board[3] == self.__player_one and self.__board[6] == self.__player_one:
+            self.__game_started = False
+            return self.__player_one
+        elif self.__board[1] == self.__player_one and self.__board[4] == self.__player_one and self.__board[7] == self.__player_one:
+            self.__game_started = False
+            return self.__player_one
+        elif self.__board[2] == self.__player_one and self.__board[5] == self.__player_one and self.__board[8] == self.__player_one:
+            self.__game_started = False
+            return self.__player_one
+        elif self.__board[0] == self.__player_one and self.__board[4] == self.__player_one and self.__board[8] == self.__player_one:
+            self.__game_started = False
+            return self.__player_one
+        elif self.__board[2] == self.__player_one and self.__board[4] == self.__player_one and self.__board[6] == self.__player_one:
+            self.__game_started = False
+            return self.__player_one
         
         # Player two wins
-        if self.board[0] == self.PLAYER_TWO and self.board[1] == self.PLAYER_TWO and self.board[2] == self.PLAYER_TWO:
-            self.game_started = False
-            return self.PLAYER_TWO
-        elif self.board[3] == self.PLAYER_TWO and self.board[4] == self.PLAYER_TWO and self.board[5] == self.PLAYER_TWO:
-            self.game_started = False
-            return self.PLAYER_TWO
-        elif self.board[6] == self.PLAYER_TWO and self.board[7] == self.PLAYER_TWO and self.board[8] == self.PLAYER_TWO:
-            self.game_started = False
-            return self.PLAYER_TWO
-        elif self.board[0] == self.PLAYER_TWO and self.board[3] == self.PLAYER_TWO and self.board[6] == self.PLAYER_TWO:
-            self.game_started = False
-            return self.PLAYER_TWO
-        elif self.board[1] == self.PLAYER_TWO and self.board[4] == self.PLAYER_TWO and self.board[7] == self.PLAYER_TWO:
-            self.game_started = False
-            return self.PLAYER_TWO
-        elif self.board[2] == self.PLAYER_TWO and self.board[5] == self.PLAYER_TWO and self.board[8] == self.PLAYER_TWO:
-            self.game_started = False
-            return self.PLAYER_TWO
-        elif self.board[0] == self.PLAYER_TWO and self.board[4] == self.PLAYER_TWO and self.board[8] == self.PLAYER_TWO:
-            self.game_started = False
-            return self.PLAYER_TWO
-        elif self.board[2] == self.PLAYER_TWO and self.board[4] == self.PLAYER_TWO and self.board[6] == self.PLAYER_TWO:
-            self.game_started = False
-            return self.PLAYER_TWO
+        if self.__board[0] == self.__player_two and self.__board[1] == self.__player_two and self.__board[2] == self.__player_two:
+            self.__game_started = False
+            return self.__player_two
+        elif self.__board[3] == self.__player_two and self.__board[4] == self.__player_two and self.__board[5] == self.__player_two:
+            self.__game_started = False
+            return self.__player_two
+        elif self.__board[6] == self.__player_two and self.__board[7] == self.__player_two and self.__board[8] == self.__player_two:
+            self.__game_started = False
+            return self.__player_two
+        elif self.__board[0] == self.__player_two and self.__board[3] == self.__player_two and self.__board[6] == self.__player_two:
+            self.__game_started = False
+            return self.__player_two
+        elif self.__board[1] == self.__player_two and self.__board[4] == self.__player_two and self.__board[7] == self.__player_two:
+            self.__game_started = False
+            return self.__player_two
+        elif self.__board[2] == self.__player_two and self.__board[5] == self.__player_two and self.__board[8] == self.__player_two:
+            self.__game_started = False
+            return self.__player_two
+        elif self.__board[0] == self.__player_two and self.__board[4] == self.__player_two and self.__board[8] == self.__player_two:
+            self.__game_started = False
+            return self.__player_two
+        elif self.__board[2] == self.__player_two and self.__board[4] == self.__player_two and self.__board[6] == self.__player_two:
+            self.__game_started = False
+            return self.__player_two
         
         # Tied game
-        if 0 not in self.board:
-            self.game_started = False
+        if 0 not in self.__board:
+            self.__game_started = False
             return 3
         
         # Still empty slots
         return 0
 
     def display_board(self) -> None:
-        if self.board.size != 9:
-            print("Wrong board size")
+        """Void function to display the int[9] array in a 3 by 3 matrix
+        """
+        if self.__board.size != 9:
+            print("Wrong __board size")
 
         else:
-            print(self.board[0:3])
-            print(self.board[3:6])
-            print(self.board[6:9]) 
+            print(self.__board[0:3])
+            print(self.__board[3:6])
+            print(self.__board[6:9]) 
             print('')  
 
     def get_current_player(self) -> int:
-        return self.current_player
+        return self.__current_player
 
     def get_board(self):
-        return copy.deepcopy(self.board)
+        """A deep copy function of the int[9] array
 
-    def start_game(self,display=False):
-        self.game_started = True
-        self.current_player = randint(1,2)
+        Returns:
+            int[9]: Deep copy of the int[9] array
+        """
+        return copy.deepcopy(self.__board)
+
+    def start_game(self,display=False) -> None:
+        """Function to start the game
+
+        Args:
+            display (bool, optional): Prints out who the first player is. Defaults to False.
+        """
+        self.__game_started = True
+        self.__current_player = randint(1,2)
         if display == True:
-            print('Player {0} is first'.format(self.current_player))
+            print('Player {0} is first'.format(self.__current_player))
 
-    def get_game_status(self):
-        return self.game_started
+    def get_game_status(self) -> bool:
+        return self.__game_started
 
-    def cal_state_space(self):
+    def cal_state_space(self) -> None:
+        """Function to calculate the state space using 18 bits. Bits 0-8 describes the placement of zeros. Bits 17-9 describes the placement of the players
+
+           Example:
+           [0 1 2]
+           [1 0 0]   => 0b001000100_010110001 == 34993
+           [2 0 1]
+
+        """
         temp_value = 0
 
-        for i in range(0,self.BOARD_SIZE*self.BOARD_SIZE):
-            if self.board[i] == 0:
+        for i in range(0,self.__board_size*self.__board_size):
+            if self.__board[i] == 0:
                 temp_value = (0b1 << i) | temp_value
 
-            elif self.board[i] == 2:
+            elif self.__board[i] == 2:
                 temp_value = (0b1 << i + 9) | temp_value
 
-        self.state_value = temp_value
+        self.__state_value = temp_value
 
-    def get_state_space(self):
-        return self.state_value
+    def get_state_space(self) -> int:
+        """Function to get the value of the state space
+
+        Returns:
+            int: self.__state_value
+        """
+        self.cal_state_space()
+        return self.__state_value
     
     def get_action_used(self):
         return False
