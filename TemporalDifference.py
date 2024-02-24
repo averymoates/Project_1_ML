@@ -1,5 +1,6 @@
 import TicTacToe
 import numpy as np
+import csv
 
 """
 Author: Avery Moates
@@ -27,7 +28,7 @@ class TemporalDifference:
         elif TD_player == 2:
             self.__opponent_player_ID = 1
 
-        self.cal_rewards()
+        self.cal_rewards(filename='temporal_difference/rewards_file.csv')
 
         #I may need to read inital values from a file to set the inital values for the rewards. I do not know though
 
@@ -57,12 +58,29 @@ class TemporalDifference:
                 else:
                     self.set_reward(i,-1)
 
-            #I probably should save the rewards to a file so that I do not have to keep doing this
+            with open('temporal_difference/rewards_file.csv', mode = 'w') as reward_file:
+                reward_writer = csv.writer(reward_file,delimiter=',')
+
+                for i in range(0,self.__max_state_space):
+                    value = str(self.__rewards[i])
+                    reward_writer.writerow([value, ""])
+
             return True
 
+        #Set the rewards from a file
         else:
-            print('Function not implemented')
-            return False
+            with open(filename) as reward_file:
+                reward_reader = csv.reader(reward_file, delimiter=',')
+                line_count = 0
+
+                for row in reward_reader:
+                    self.__rewards[line_count] = float(row[0])
+                    print(row[0])
+                    line_count = line_count + 1
+
+                print(line_count)
+            
+            return True
 
 
     #Function to set the individual rewards for each state

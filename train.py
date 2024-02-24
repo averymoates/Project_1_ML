@@ -2,6 +2,7 @@ import TicTacToe as TTT
 import TemporalDifference as td
 import numpy as np
 import sys
+import csv
 
 from alphabeta import alphabeta
 
