@@ -1,4 +1,5 @@
-import TicTacToe
+import TicTacToe as ttt
+from TicTacToe import TicTacToe
 import numpy as np
 import csv
 
@@ -16,7 +17,7 @@ class TemporalDifference:
 
     def __init__(self, max_state_space: int, alpha: float, gamma: float, TD_player: int) -> None:
         self.__max_state_space = max_state_space
-        self.__state_values = np.zeros(self.__max_state_space)
+        self.__state_values = np.ones(self.__max_state_space)
         self.__rewards = np.zeros(self.__max_state_space)
         self.__alpha = alpha
         self.__gamma = gamma
@@ -28,21 +29,54 @@ class TemporalDifference:
         elif TD_player == 2:
             self.__opponent_player_ID = 1
 
-        self.cal_rewards(filename='temporal_difference/rewards_file.csv')
-
-        #I may need to read inital values from a file to set the inital values for the rewards. I do not know though
+        self.get_rewards(filename='temporal_difference/rewards_file.csv')
+        
 
     def TD_make_move(self, board, board_size: int) -> int:
+        best_move = -1
+        best_state_value = -100_000_000
 
         for i in range(0,board_size):
             #The current idea is to loop through all the possible actions. Find the best state value, then just return that move.
-            pass
+            game = ttt.TicTacToe(board,self.__td_player_ID,True)
+
+            #find the best move based on the next state value then make that move.
+            if game.is_empty(i):
+                game.make_move(i,self.__td_player_ID)
+                next_state_space = self.board_to_state_space(game.get_board(), board_size)
+                game.unmake_move(i,self.__td_player_ID)
+
+                value = self.__state_values[next_state_space]
+
+                if value > best_state_value:
+                    best_state_value = value
+                    best_move = i
+
+        game = ttt.TicTacToe(board,self.__td_player_ID,True)
+        game.make_move(best_move,self.__td_player_ID)
+
+        current_state_space = self.board_to_state_space(board, board_size)
+        next_state_space = self.board_to_state_space(game.get_board(), board_size)
+
+        current_state_value = self.get_state_value(current_state_space)
+        next_state_value = self.get_state_value(next_state_space)
+        next_reward = self.get_reward(next_state_space)
+
+        #Update state value array
+        self.__state_values[current_state_space] = current_state_value + self.__alpha*(next_reward + self.__gamma*next_state_value - current_state_value)
+        # print(self.__state_values[current_state_space])
+
+        return best_move
 
     #----------------------------------------------------------------------------------
     #Helper set up functions
     #----------------------------------------------------------------------------------
+
+    def print_state_values(self):
+        for i in range(0,self.__max_state_space):
+            print(self.__state_values[i])
         
-    def cal_rewards(self,filename='filename.csv') -> bool:
+    def get_rewards(self,filename='filename.csv') -> bool:
         #Calculate the rewards iteratively
         if filename == 'filename.csv':
             for i in range(0,self.__max_state_space):
@@ -75,13 +109,9 @@ class TemporalDifference:
 
                 for row in reward_reader:
                     self.__rewards[line_count] = float(row[0])
-                    print(row[0])
                     line_count = line_count + 1
-
-                print(line_count)
             
             return True
-
 
     #Function to set the individual rewards for each state
     def set_reward(self,state_space,reward) -> bool:
@@ -160,6 +190,9 @@ class TemporalDifference:
     def get_state_values(self):
         return self.__states
     
+    def get_state_value(self, state_space: int) -> float:
+        return self.__state_values[state_space]
+
     def get_all_rewards(self):
         return self.__rewards
     

@@ -23,7 +23,7 @@ class TicTacToe:
 
     __state_value = 0b111111111000000000
 
-    def __init__(self, board = np.array([0,0,0,0,0,0,0,0,0]), currentplayer=-1, game_started=False):
+    def __init__(self, board = np.array([0,0,0,0,0,0,0,0,0]), current_player=-1, game_started=False):
         """Constructor function
 
         Args:
@@ -32,7 +32,7 @@ class TicTacToe:
             game_started (bool, optional): _description_. Defaults to False.
         """
         self.__board = board
-        self.__current_player = currentplayer
+        self.__current_player = current_player
         self.__game_started = game_started
 
     def make_move(self,placement: int, player: int) -> bool:
@@ -51,7 +51,7 @@ class TicTacToe:
 
         # Return false if the placement is not 0,1,2,3,4,5,6,7,8
         if (placement < 0) or (placement >= 9):
-            print('Wrong placement value')
+            print('Wrong placement value {0} player {1}'.format(placement, player))
             return False
         
         if player != self.__current_player:

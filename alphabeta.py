@@ -33,7 +33,7 @@ class alphabeta:
         """
         self.__max_depth = depth
         #Setting everything up so that alpha beta works
-        game = TicTacToe(board=board,currentplayer=player,game_started=True)
+        game = TicTacToe(board=board,current_player=player,game_started=True)
         maxPlayer = game.get_current_player()
 
         #Error if the max player is not the current player
