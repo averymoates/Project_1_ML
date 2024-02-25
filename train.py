@@ -8,14 +8,14 @@ from alphabeta import alphabeta
 
 def main():
     alpha = 0.01
-    gamma = 0.01
+    gamma = 0.05
 
     Player_one = alphabeta()
     Player_two = td.TemporalDifference(2**18, alpha, gamma, 2)
 
     train_counter = 0
 
-    #Trainning
+    #Training
     while train_counter != 500:
         game = TTT.TicTacToe(board=np.array([0,0,0,0,0,0,0,0,0]),current_player=1,game_started=True)
         # game.start_game()
@@ -44,8 +44,8 @@ def main():
             game_ties = 0
             
             while game_counter != 50:
-                game = TTT.TicTacToe(board=np.array([0,0,0,0,0,0,0,0,0]),current_player=-1,game_started=False)
-                game.start_game()
+                game = TTT.TicTacToe(board=np.array([0,0,0,0,0,0,0,0,0]),current_player=1,game_started=True)
+                # game.start_game()
                 current_player = game.get_current_player()
 
                 while(game.get_game_status()):
@@ -77,6 +77,9 @@ def main():
 
 
         train_counter = train_counter + 1
+
+    for i in range(0,Player_two.get_max_state_space()):
+        print('{0},{1},{2}'.format(i,Player_two.get_state_value(i),0.0))
 
 if __name__ == '__main__':
     main()

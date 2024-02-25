@@ -29,9 +29,10 @@ class TemporalDifference:
         elif TD_player == 2:
             self.__opponent_player_ID = 1
 
-        self.get_rewards(filename='temporal_difference/rewards_file.csv')
+        self.set_rewards(filename='temporal_difference/rewards_file.csv')
 
     def train_td(self, board, board_size: int) -> int:
+        current_state_space = self.board_to_state_space(board,board_size)
         temp_game = ttt.TicTacToe(board,self.__td_player_ID,True)
 
         #Setting up the policy. I want to give every possible move a eqaul chance
@@ -42,13 +43,15 @@ class TemporalDifference:
         temp_game.make_move(random_move,self.__td_player_ID)
 
         next_state_space = self.board_to_state_space(temp_game.get_board(), board_size)
-        current_state_space = self.board_to_state_space(board,board_size)
+        
 
         current_state_value = self.get_state_value(current_state_space)
         next_state_value = self.get_state_value(next_state_space)
         next_reward = self.get_reward(next_state_space)
 
         self.__state_values[current_state_space] = current_state_value + self.__alpha*(next_reward + self.__gamma*next_state_value - current_state_value)
+
+        # print('Old current state value: {0}\n New current state value: {1}\n Current state space: {2}\n Next state value: {3}\n Next state space: {4}\n Next reward: {5}'.format(current_state_value, self.__state_values[current_state_space],current_state_space,next_state_value,next_state_space,next_reward))
 
         return random_move
 
@@ -74,6 +77,9 @@ class TemporalDifference:
                     best_state_value = value
                     best_move = i
 
+                # print('Move {0} has state value: {1}, and reward: {2}, next state space is: {3}'.format(i,value, self.get_reward(next_state_space), next_state_space))
+
+        # print('TD chose move {0}'.format(best_move))
         return best_move
 
     #----------------------------------------------------------------------------------
@@ -84,7 +90,7 @@ class TemporalDifference:
         for i in range(0,self.__max_state_space):
             print(self.__state_values[i])
         
-    def get_rewards(self,filename='filename.csv') -> bool:
+    def set_rewards(self,filename='filename.csv') -> bool:
         #Calculate the rewards iteratively
         if filename == 'filename.csv':
             for i in range(0,self.__max_state_space):
@@ -158,6 +164,31 @@ class TemporalDifference:
                     board[i] = 1
 
         return board
+
+    def load_state_values(self, filename='filename.csv', line_num=50):
+
+        if filename=='filename.csv':
+            print('No filename path was given. Please try again')
+            return False
+
+        else:
+            with open(filename) as state_value_file:
+                state_value_reader = csv.reader(state_value_file, delimiter=',')
+                line_count = 0
+                offset_counter = 0
+
+                for row in state_value_reader:
+                    if offset_counter == line_num:
+                        self.__state_values[line_count] = float(row[1])
+                        line_count = line_count + 1
+                        
+                    else:
+                        # print(offset_counter)
+                        offset_counter = offset_counter + 1
+                        
+            
+            return True
+
     
     def evaluate_game(self, TTTgame: TicTacToe, TD_player: int, opponent_player: int) -> int:
         """Function to calculate the score of the board. 0 if the board has no winner, a 1 for max player winning and additional 1 for each empty space, and a -1 for min player winning and additional -1 for each empty space
@@ -196,7 +227,7 @@ class TemporalDifference:
     #Debug functions
     #----------------------------------------------------------------------------------
     def get_state_values(self):
-        return self.__states
+        return self.__state_values
     
     def get_state_value(self, state_space: int) -> float:
         return self.__state_values[state_space]
@@ -212,4 +243,7 @@ class TemporalDifference:
     
     def get_gamma(self) -> float:
         return self.__gamma
+
+    def get_max_state_space(self) -> int:
+        return self.__max_state_space
         
