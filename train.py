@@ -7,8 +7,8 @@ import csv
 from alphabeta import alphabeta
 
 def main():
-    alpha = 0.01
-    gamma = 0.05
+    alpha = 0.2
+    gamma = 0.1
 
     Player_one = alphabeta()
     Player_two = td.TemporalDifference(2**18, alpha, gamma, 2)
@@ -17,8 +17,8 @@ def main():
 
     #Training
     while train_counter != 500:
-        game = TTT.TicTacToe(board=np.array([0,0,0,0,0,0,0,0,0]),current_player=1,game_started=True)
-        # game.start_game()
+        game = TTT.TicTacToe(board=np.array([0,0,0,0,0,0,0,0,0]),current_player=-1,game_started=False)
+        game.start_game()
         current_player = game.get_current_player()
 
         #Complete one game of training
@@ -44,8 +44,8 @@ def main():
             game_ties = 0
             
             while game_counter != 50:
-                game = TTT.TicTacToe(board=np.array([0,0,0,0,0,0,0,0,0]),current_player=1,game_started=True)
-                # game.start_game()
+                game = TTT.TicTacToe(board=np.array([0,0,0,0,0,0,0,0,0]),current_player=-1,game_started=False)
+                game.start_game()
                 current_player = game.get_current_player()
 
                 while(game.get_game_status()):
@@ -73,11 +73,13 @@ def main():
                 elif winner == 3:
                     game_ties = game_ties + 1
 
+            #Print the win ratios
             print('{0},{1},{2}'.format(player_one_wins/total_games, player_two_wins/total_games, game_ties/total_games))
 
 
         train_counter = train_counter + 1
 
+    #Print all the state values for future loading
     for i in range(0,Player_two.get_max_state_space()):
         print('{0},{1},{2}'.format(i,Player_two.get_state_value(i),0.0))
 

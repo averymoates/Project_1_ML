@@ -17,7 +17,7 @@ class TemporalDifference:
 
     def __init__(self, max_state_space: int, alpha: float, gamma: float, TD_player: int) -> None:
         self.__max_state_space = max_state_space
-        self.__state_values = np.ones(self.__max_state_space)
+        self.__state_values = np.zeros(self.__max_state_space)
         self.__rewards = np.zeros(self.__max_state_space)
         self.__alpha = alpha
         self.__gamma = gamma
@@ -29,6 +29,7 @@ class TemporalDifference:
         elif TD_player == 2:
             self.__opponent_player_ID = 1
 
+        #filename='temporal_difference/rewards_file.csv'
         self.set_rewards(filename='temporal_difference/rewards_file.csv')
 
     def train_td(self, board, board_size: int) -> int:
@@ -93,18 +94,7 @@ class TemporalDifference:
     def set_rewards(self,filename='filename.csv') -> bool:
         #Calculate the rewards iteratively
         if filename == 'filename.csv':
-            for i in range(0,self.__max_state_space):
-                board = self.state_space_to_board(i,9)
-                game = TicTacToe.TicTacToe(board)
-
-                winner = game.check_board()
-
-                if winner == self.__td_player_ID:
-                    self.set_reward(i,10)
-                elif winner == self.__opponent_player_ID:
-                    self.set_reward(i,-10)
-                else:
-                    self.set_reward(i,-1)
+            self.set_rewards_iteratively(9)
 
             with open('temporal_difference/rewards_file.csv', mode = 'w') as reward_file:
                 reward_writer = csv.writer(reward_file,delimiter=',')
@@ -123,18 +113,10 @@ class TemporalDifference:
 
                 for row in reward_reader:
                     self.__rewards[line_count] = float(row[0])
+                    self.__state_values[line_count] = float(row[0])
                     line_count = line_count + 1
             
             return True
-
-    #Function to set the individual rewards for each state
-    def set_reward(self,state_space,reward) -> bool:
-        if state_space > self.__max_state_space:
-            print('State value is too big')
-            return False
-        
-        self.__rewards[state_space] = reward
-        return True
     
     #Convert a Tic Tac Toe board to its state space
     def board_to_state_space(self, board, board_size: int) -> int:
@@ -189,39 +171,91 @@ class TemporalDifference:
             
             return True
 
-    
-    def evaluate_game(self, TTTgame: TicTacToe, TD_player: int, opponent_player: int) -> int:
-        """Function to calculate the score of the board. 0 if the board has no winner, a 1 for max player winning and additional 1 for each empty space, and a -1 for min player winning and additional -1 for each empty space
+    def set_rewards_iteratively(self, board_size: int):
 
-        Args:
-            TTTgame (TicTacToe): _description_
-            maxPlayer (int): _description_
-            minPlayer (int): _description_
+        for i in range(0, self.__max_state_space):
+            board = self.state_space_to_board(i, board_size)
+            reward = self.calc_reward_from_board(board)
+            self.__rewards[i] = reward
+            self.__state_values[i] = reward
 
-        Returns:
-            int: _description_
-        """
-        winner = TTTgame.check_board()
+    def calc_reward_from_board(self, board) -> float:
+        #If the TD player wins give a big reward
+        if board[0] == self.__td_player_ID and board[1] == self.__td_player_ID and board[2] == self.__td_player_ID:
+            return 100.0
+        elif board[3] == self.__td_player_ID and board[4] == self.__td_player_ID and board[5] == self.__td_player_ID:
+            return 100.0
+        elif board[6] == self.__td_player_ID and board[7] == self.__td_player_ID and board[8] == self.__td_player_ID:
+            return 100.0
+        elif board[0] == self.__td_player_ID and board[3] == self.__td_player_ID and board[6] == self.__td_player_ID:
+            return 100.0
+        elif board[1] == self.__td_player_ID and board[4] == self.__td_player_ID and board[7] == self.__td_player_ID:
+            return 100.0
+        elif board[2] == self.__td_player_ID and board[5] == self.__td_player_ID and board[8] == self.__td_player_ID:
+            return 100.0
+        elif board[0] == self.__td_player_ID and board[4] == self.__td_player_ID and board[8] == self.__td_player_ID:
+            return 100.0
+        elif board[2] == self.__td_player_ID and board[4] == self.__td_player_ID and board[6] == self.__td_player_ID:
+            return 100.0
 
-        if winner == TD_player:
-            score = 1
-            for i in range(0,9):
-                if TTTgame.is_empty(i):
-                    score = score + 1
+        #If the opponent player is about to win, give a bad reward
+        if board[0] == self.__opponent_player_ID and board[1] == self.__opponent_player_ID and board[2] == 0:
+            return -50.0
+        elif board[0] == 0 and board[1] == self.__opponent_player_ID and board[2] == self.__opponent_player_ID:
+            return -50.0
+        elif board[0] == self.__opponent_player_ID and board[1] == 0 and board[2] == self.__opponent_player_ID:
+            return -50.0
 
-            return score
-            
-        elif winner == opponent_player:
-            score = -1
-            for i in range(0,9):
-                if TTTgame.is_empty(i):
-                    score = score - 1
-            
-            return score
-        
-        else:
-            return 0
+        elif board[3] == self.__opponent_player_ID and board[4] == self.__opponent_player_ID and board[5] == 0:
+            return -50.0
+        elif board[3] == 0 and board[4] == self.__opponent_player_ID and board[5] == self.__opponent_player_ID:
+            return -50.0
+        elif board[3] == self.__opponent_player_ID and board[4] == 0 and board[5] == self.__opponent_player_ID:
+            return -50.0
 
+        elif board[6] == self.__opponent_player_ID and board[7] == self.__opponent_player_ID and board[8] == 0:
+            return -50.0
+        elif board[6] == 0 and board[7] == self.__opponent_player_ID and board[8] == self.__opponent_player_ID:
+            return -50.0
+        elif board[6] == self.__opponent_player_ID and board[7] == 0 and board[8] == self.__opponent_player_ID:
+            return -50.0
+
+        elif board[0] == self.__opponent_player_ID and board[3] == self.__opponent_player_ID and board[6] == 0:
+            return -50.0
+        elif board[0] == 0 and board[3] == self.__opponent_player_ID and board[6] == self.__opponent_player_ID:
+            return -50.0
+        elif board[0] == self.__opponent_player_ID and board[3] == 0 and board[6] == self.__opponent_player_ID:
+            return -50.0
+
+        elif board[1] == self.__opponent_player_ID and board[4] == self.__opponent_player_ID and board[7] == 0:
+            return -50.0
+        elif board[1] == 0 and board[4] == self.__opponent_player_ID and board[7] == self.__opponent_player_ID:
+            return -50.0
+        elif board[1] == self.__opponent_player_ID and board[4] == 0 and board[7] == self.__opponent_player_ID:
+            return -50.0
+
+        elif board[2] == self.__opponent_player_ID and board[5] == self.__opponent_player_ID and board[8] == 0:
+            return -50.0
+        elif board[2] == 0 and board[5] == self.__opponent_player_ID and board[8] == self.__opponent_player_ID:
+            return -50.0
+        elif board[2] == self.__opponent_player_ID and board[5] == 0 and board[8] == self.__opponent_player_ID:
+            return -50.0
+
+        elif board[0] == self.__opponent_player_ID and board[4] == self.__opponent_player_ID and board[8] == 0:
+            return -50.0
+        elif board[0] == 0 and board[4] == self.__opponent_player_ID and board[8] == self.__opponent_player_ID:
+            return -50.0
+        elif board[0] == self.__opponent_player_ID and board[4] == 0 and board[8] == self.__opponent_player_ID:
+            return -50.0
+
+        elif board[2] == self.__opponent_player_ID and board[4] == self.__opponent_player_ID and board[6] == 0:
+            return -50.0
+        elif board[2] == 0 and board[4] == self.__opponent_player_ID and board[6] == self.__opponent_player_ID:
+            return -50.0
+        elif board[2] == self.__opponent_player_ID and board[4] == 0 and board[6] == self.__opponent_player_ID:
+            return -50.0
+
+        return -5.0
 
     #----------------------------------------------------------------------------------
     #Debug functions
