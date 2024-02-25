@@ -30,6 +30,28 @@ class TemporalDifference:
             self.__opponent_player_ID = 1
 
         self.get_rewards(filename='temporal_difference/rewards_file.csv')
+
+    def train_td(self, board, board_size: int) -> int:
+        temp_game = ttt.TicTacToe(board,self.__td_player_ID,True)
+
+        #Setting up the policy. I want to give every possible move a eqaul chance
+        possible_moves = temp_game.get_possible_actions()
+        random_move = np.random.choice(possible_moves,1)
+
+        #Agent making the move then updating the current state value based on current state value, next reward, next state value
+        temp_game.make_move(random_move,self.__td_player_ID)
+
+        next_state_space = self.board_to_state_space(temp_game.get_board(), board_size)
+        current_state_space = self.board_to_state_space(board,board_size)
+
+        current_state_value = self.get_state_value(current_state_space)
+        next_state_value = self.get_state_value(next_state_space)
+        next_reward = self.get_reward(next_state_space)
+
+        self.__state_values[current_state_space] = current_state_value + self.__alpha*(next_reward + self.__gamma*next_state_value - current_state_value)
+
+        return random_move
+
         
 
     def TD_make_move(self, board, board_size: int) -> int:
@@ -51,20 +73,6 @@ class TemporalDifference:
                 if value > best_state_value:
                     best_state_value = value
                     best_move = i
-
-        game = ttt.TicTacToe(board,self.__td_player_ID,True)
-        game.make_move(best_move,self.__td_player_ID)
-
-        current_state_space = self.board_to_state_space(board, board_size)
-        next_state_space = self.board_to_state_space(game.get_board(), board_size)
-
-        current_state_value = self.get_state_value(current_state_space)
-        next_state_value = self.get_state_value(next_state_space)
-        next_reward = self.get_reward(next_state_space)
-
-        #Update state value array
-        self.__state_values[current_state_space] = current_state_value + self.__alpha*(next_reward + self.__gamma*next_state_value - current_state_value)
-        # print(self.__state_values[current_state_space])
 
         return best_move
 

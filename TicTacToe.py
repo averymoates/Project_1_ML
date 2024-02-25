@@ -282,3 +282,21 @@ class TicTacToe:
     def get_action_used(self):
         return False
         #Need to work on this function
+
+    def get_possible_actions(self):
+        move = np.array([-1])
+        move_index = 0
+        
+        for i in range(0, self.__board_size*self.__board_size):
+            if self.__board[i] == 0:
+                if move.size > move_index:
+                    move[move_index] = i
+                    move_index = move_index + 1
+
+                else:
+                    move = np.insert(move,move_index,i)
+                    move_index = move_index + 1
+
+                
+            
+        return move
