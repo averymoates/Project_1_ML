@@ -1,10 +1,10 @@
-import TicTacToe as TTT
-import TemporalDifference as td
+import TicTacToe.TicTacToe as TTT
+import TemporalDifference.TemporalDifference as td
 import numpy as np
 import sys
 import csv
 
-from alphabeta import alphabeta
+from TicTacToe.alphabeta import alphabeta
 
 def main():
     alpha = 0.2

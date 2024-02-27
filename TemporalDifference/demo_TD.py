@@ -1,9 +1,9 @@
-import TicTacToe as TTT
+import TicTacToe.TicTacToe as TTT
 import numpy as np
-import TemporalDifference as td
+import TemporalDifference.TemporalDifference as td
 import sys
 
-from alphabeta import alphabeta
+from TicTacToe.alphabeta import alphabeta
 
 '''
 Note for future:
@@ -16,8 +16,9 @@ def main():
     alpha = 0.01
     gamma = 0.05
 
-    game = TTT.TicTacToe(board=np.array([0,0,0,0,0,0,0,0,0]),current_player=1,game_started=True)
-    # game.start_game()
+    game = TTT.TicTacToe()
+    game.set_first_player(1)
+    game.start_game()
 
     Player_two = td.TemporalDifference(2**18, alpha, gamma, 2)
     Player_two.load_state_values(filename='temporal_difference_data_2/gamma_0_05_alpha_0_01/ver_1.csv',line_num=50)
