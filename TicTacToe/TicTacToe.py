@@ -16,11 +16,11 @@ class TicTacToe:
     __board = None
     __board_size = 9
     __player_one = 1
-    __player_two = 2
+    __player_two = -1
     __game_started = False
     __current_player = -1
 
-    def __init__(self, board = np.array([0,0,0,0,0,0,0,0,0]), current_player=-1, game_started=False):
+    def __init__(self, board = np.array([0,0,0,0,0,0,0,0,0]), current_player=0, game_started=False):
         """Constructor function
 
         Args:
@@ -59,9 +59,9 @@ class TicTacToe:
         if self.check_move(placement):
             self.__board[placement] = player
             if player==1:
-                self.__current_player = 2
+                self.__current_player = -1
 
-            elif player==2:
+            elif player==-1:
                 self.__current_player = 1
 
             return True
@@ -89,12 +89,12 @@ class TicTacToe:
         
         if self.__board[placement] == player:
             
-            if player == 1 and self.__current_player == 2:
+            if player == 1 and self.__current_player == -1:
                 self.__board[placement] = 0
                 self.__current_player = player
                 self.__game_started = True
 
-            elif player == 2 and self.__current_player == 1:
+            elif player == -1 and self.__current_player == 1:
                 self.__board[placement] = 0
                 self.__current_player = player
                 self.__game_started = True
@@ -217,10 +217,23 @@ class TicTacToe:
             print("Wrong __board size")
 
         else:
-            print(self.__board[0:3])
-            print(self.__board[3:6])
-            print(self.__board[6:9]) 
-            print('')  
+            output_string = ''
+            for i in range(0,self.__board_size):
+                    
+                if self.__board[i] == 1:
+                    output_string = output_string + 'O'
+                
+                elif self.__board[i] == 0:
+                    output_string = output_string + '-'
+                    
+                elif self.__board[i] == -1:
+                    output_string = output_string + 'X'
+                    
+                if i in [2,5,8]:
+                    output_string = output_string + '\n'
+                    
+            print(output_string)
+                
 
     def get_current_player(self) -> int:
         return self.__current_player
@@ -240,7 +253,7 @@ class TicTacToe:
             display (bool, optional): Prints out who the first player is. Defaults to False.
         """
         self.__game_started = True
-        self.__current_player = randint(1,2)
+        self.__current_player = np.random.choice([-1,1],1)
         if display == True:
             print('Player {0} is first'.format(self.__current_player))
 
@@ -261,9 +274,9 @@ class TicTacToe:
         Returns:
             bool: True if it was successful
         """
-        if first_player != 1 or first_player != 2:
+        if first_player != self.__player_one or first_player != self.__player_two:
             print('Wrong player ID values')
-            self.__current_player = -1
+            self.__current_player = 0
             return False
 
         else:
@@ -295,7 +308,7 @@ class TicTacToe:
             if self.__board[i] == 0:
                 temp_value = (0b1 << i) | temp_value
 
-            elif self.__board[i] == 2:
+            elif self.__board[i] == self.__player_two:
                 temp_value = (0b1 << i + 9) | temp_value
 
         return temp_value
@@ -329,3 +342,9 @@ class TicTacToe:
                     move_index = move_index + 1
 
         return move
+    
+    def get_player_one(self) -> int:
+        return self.__player_one
+    
+    def get_player_two(self) -> int:
+        return self.__player_two

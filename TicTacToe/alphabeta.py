@@ -44,9 +44,9 @@ class alphabeta:
         #Set the min player
         minPlayer = 0
         if maxPlayer == 1:
-            minPlayer = 2
+            minPlayer = -1
 
-        elif maxPlayer == 2:
+        elif maxPlayer == -1:
             minPlayer = 1
 
         alpha = -100_000_000_000
