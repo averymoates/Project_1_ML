@@ -13,6 +13,7 @@ Simple tic tac toe game
 class TicTacToe:
 
     #Private variables
+    __board = None
     __board_size = 9
     __player_one = 1
     __player_two = 2
@@ -83,7 +84,7 @@ class TicTacToe:
             return False
         
         if self.__current_player == player:
-            print('Current player can not numake move')
+            print('Current player can not numake a move')
             return False
         
         if self.__board[placement] == player:
