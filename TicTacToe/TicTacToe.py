@@ -12,16 +12,12 @@ Simple tic tac toe game
 
 class TicTacToe:
 
-    __board_size = 3
-
+    #Private variables
+    __board_size = 9
     __player_one = 1
     __player_two = 2
-
     __game_started = False
-
     __current_player = -1
-
-    __state_value = 0b111111111000000000
 
     def __init__(self, board = np.array([0,0,0,0,0,0,0,0,0]), current_player=-1, game_started=False):
         """Constructor function
@@ -228,7 +224,7 @@ class TicTacToe:
     def get_current_player(self) -> int:
         return self.__current_player
 
-    def get_board(self):
+    def get_board(self) -> np.ndarray:
         """A deep copy function of the int[9] array
 
         Returns:
@@ -247,10 +243,41 @@ class TicTacToe:
         if display == True:
             print('Player {0} is first'.format(self.__current_player))
 
+    def set_board_to(self, board: np.ndarray) -> None:
+        """Function to set the Tic Tac Toe to a certain board configuration
+
+        Args:
+            board (np.ndarray): board array
+        """
+        self.__board = copy.deepcopy(board)
+        
+    def set_first_player(self,first_player: int) -> bool:
+        """Function to set the first player
+
+        Args:
+            first_player (int): Player ID that you want to go first
+
+        Returns:
+            bool: True if it was successful
+        """
+        if first_player != 1 or first_player != 2:
+            print('Wrong player ID values')
+            self.__current_player = -1
+            return False
+
+        else:
+            self.__current_player = first_player
+            return True
+    
     def get_game_status(self) -> bool:
+        """Function to see if the game is going or not
+
+        Returns:
+            bool: True if the game is on, False if the game is not on
+        """
         return self.__game_started
 
-    def cal_state_space(self) -> None:
+    def cal_state_space(self) -> int:
         """Function to calculate the state space using 18 bits. Bits 0-8 describes the placement of zeros. Bits 17-9 describes the placement of the players
 
            Example:
@@ -258,36 +285,39 @@ class TicTacToe:
            [1 0 0]   => 0b001000100_010110001 == 34993
            [2 0 1]
 
+        Returns:
+            int: value that will represent the board placement
         """
         temp_value = 0
 
-        for i in range(0,self.__board_size*self.__board_size):
+        for i in range(0,self.__board_size):
             if self.__board[i] == 0:
                 temp_value = (0b1 << i) | temp_value
 
             elif self.__board[i] == 2:
                 temp_value = (0b1 << i + 9) | temp_value
 
-        self.__state_value = temp_value
+        return temp_value
 
-    def get_state_space(self) -> int:
-        """Function to get the value of the state space
+    # def get_state_space(self) -> int:
+    #     """Function to get the value of the state space
+
+    #     Returns:
+    #         int: self.__state_value
+    #     """
+    #     self.cal_state_space()
+    #     return self.__state_value
+
+    def get_possible_actions(self) -> np.ndarray:
+        """Function to get all the possible placement values
 
         Returns:
-            int: self.__state_value
+            np.ndarray: array of all the possible placement values
         """
-        self.cal_state_space()
-        return self.__state_value
-    
-    def get_action_used(self):
-        return False
-        #Need to work on this function
-
-    def get_possible_actions(self):
-        move = np.array([-1])
+        move = np.array([])
         move_index = 0
         
-        for i in range(0, self.__board_size*self.__board_size):
+        for i in range(0, self.__board_size):
             if self.__board[i] == 0:
                 if move.size > move_index:
                     move[move_index] = i
@@ -297,6 +327,4 @@ class TicTacToe:
                     move = np.insert(move,move_index,i)
                     move_index = move_index + 1
 
-                
-            
         return move

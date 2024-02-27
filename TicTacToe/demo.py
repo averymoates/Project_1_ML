@@ -25,6 +25,7 @@ def main():
             game.display_board()
 
         elif current_player == 2:
+            print(game.get_possible_actions())
             print('Player 2, enter your move:')
             placement = int(input())
             game.make_move(placement,2)
