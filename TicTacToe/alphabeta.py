@@ -33,7 +33,10 @@ class alphabeta:
         """
         self.__max_depth = depth
         #Setting everything up so that alpha beta works
-        game = TicTacToe(board=board,current_player=player,game_started=True)
+        game = TicTacToe()
+        game.set_board_to(board)
+        game.set_current_player_to(player)
+        game.set_game_to_playable()
         maxPlayer = game.get_current_player()
 
         #Error if the max player is not the current player
@@ -43,11 +46,11 @@ class alphabeta:
         
         #Set the min player
         minPlayer = 0
-        if maxPlayer == 1:
-            minPlayer = -1
+        if maxPlayer == game.get_player_one():
+            minPlayer = game.get_player_two()
 
-        elif maxPlayer == -1:
-            minPlayer = 1
+        elif maxPlayer == game.get_player_two():
+            minPlayer = game.get_player_one()
 
         alpha = -100_000_000_000
         beta = 100_000_000_000
@@ -105,7 +108,7 @@ class alphabeta:
         Returns:
             int: _description_
         """
-        if TTTgame.check_board() != 0 or depth > self.__max_depth:
+        if TTTgame.check_game() != 0 or depth > self.__max_depth:
             return self.evaluate_game(TTTgame,maxPlayer,minPlayer)
         
         if isMax == True:
@@ -151,7 +154,7 @@ class alphabeta:
         Returns:
             int: _description_
         """
-        winner = TTTgame.check_board()
+        winner = TTTgame.check_game()
 
         if winner == maxPlayer:
             score = 1

@@ -1,104 +1,198 @@
 import numpy as np
-from random import randint
 import copy
 
-"""
-Author: Avery Moates
-Date: 2/23/2024
 
-Simple tic tac toe game
-
-"""
 
 class TicTacToe:
+    """
+    Class to simulate a game of tic tac toe with 2 players
+
+    Author: Avery Moates
+    Date: 2/28/2024
+    """
 
     #Private variables
     __board = None
-    __board_size = 9
+    __row_size = 3
+    __col_size = 3
     __player_one = 1
     __player_two = -1
-    __game_started = False
-    __current_player = -1
+    __playable = False
+    __current_player = 0
 
-    def __init__(self, board = np.array([0,0,0,0,0,0,0,0,0]), current_player=0, game_started=False):
-        """Constructor function
-
-        Args:
-            board (int[9], optional): _description_. Defaults to np.array([0,0,0,0,0,0,0,0,0]).
-            currentplayer (int, optional): _description_. Defaults to -1.
-            game_started (bool, optional): _description_. Defaults to False.
+    def __init__(self) -> None:
+        """Constructor
         """
-        self.__board = board
-        self.__current_player = current_player
-        self.__game_started = game_started
+        self.__board = np.zeros([self.__row_size,self.__col_size])
 
-    def make_move(self,placement: int, player: int) -> bool:
-        """Function to make a move for a certain player
+    #------------------------------------------------------------------------------------
+    #Setter Functions
+    #------------------------------------------------------------------------------------
+        
+    def set_board_to(self, board: np.ndarray) -> bool:
+        """Function to override the current board to another board
 
         Args:
-            placement (int): Index value
-            player (int): Player
+            board (np.ndarray): 3X3 numpy ndarray with 0,1,-1
 
         Returns:
-            bool: True if the the move was legal. False if the move was illegal
+            bool: True if the operations was successful
         """
-        if self.__game_started == False:
-            print('Tic Tac Toe has not started')
+        if board.shape != (self.__row_size,self.__col_size):
+            print('Wrong board dimensions')
             return False
-
-        # Return false if the placement is not 0,1,2,3,4,5,6,7,8
-        if (placement < 0) or (placement >= 9):
-            print('Wrong placement value {0} player {1}'.format(placement, player))
-            return False
-        
-        if player != self.__current_player:
-            print('Wrong player')
-            return False
-
-        # Return true if the placement is legal
-        if self.check_move(placement):
-            self.__board[placement] = player
-            if player==1:
-                self.__current_player = -1
-
-            elif player==-1:
-                self.__current_player = 1
-
+        #There is no check to see if the elements are 0,1, or -1
+        else:
+            self.__board = copy.deepcopy(board)
             return True
         
-        # Return false if the placement is not legal
-        return False
-
-    def unmake_move(self,placement: int, player: int) -> bool:
-        """Function to unmake a move for a certain player. NOTE: you can only unmake a move for the player that just make a move. Be carefull using this function
+    def set_current_player_to(self, player: int) -> bool:
+        """Function to set the current player
 
         Args:
-            placement (int): Index value
-            player (int): Player
+            player (int): value of 0, 1, or -1
 
         Returns:
-            bool: True if the action was legal. False if the action was illegal
+            bool: True if the operation was successful
         """
-        if placement<0 or placement>=9:
-            print('Wrong placement value')
+        if player in [self.__player_one, self.__player_two]:
+            self.__current_player = player
+            return True
+        else:
+            print('{0} is a wrong value for player'.format(player))
             return False
         
-        if self.__current_player == player:
-            print('Current player can not numake a move')
+    def set_game_to_playable(self, choose_random_player = True) -> None:
+        """Function to make the game playable
+
+        Args:
+            choose_random_player (bool, optional): _description_. Defaults to True.
+        """
+        self.__playable = True
+
+        if choose_random_player == True and self.__current_player == 0:
+            self.__current_player = np.random.choice([self.__player_one, self.__player_two], 1)
+
+        elif choose_random_player == False and self.__current_player == 0:
+            self.__current_player = self.__player_one
+
+    #------------------------------------------------------------------------------------
+    #Helper Functions
+    #------------------------------------------------------------------------------------
+    
+    def is_empty(self, placement: int) -> bool:
+        """Function to check if a placement value is playable
+
+        Args:
+            placement (int): 0-8 int value
+
+        Returns:
+            bool: True if the placement value is playable
+        """
+        if placement < 0 or placement >= 9:
+            print('Placement value of [{0}]'.format(placement))
             return False
         
-        if self.__board[placement] == player:
+        else:
+            col = int(placement % self.__col_size)
+            row = int((placement-col)/self.__row_size)
+            if self.__board[row,col] == 0:
+                return True
+            else:
+                return False
+
+    def change_player(self) -> bool:
+        """Function to change player
+
+        Returns:
+            bool: _description_
+        """
+        if self.__current_player == 0:
+            print('Game has not started.')
+            return False
+        
+        if self.__current_player == self.__player_one:
+            self.__current_player = self.__player_two
+            return True
+        elif self.__current_player == self.__player_two:
+            self.__current_player = self.__player_one
+            return True
+        
+
+    #------------------------------------------------------------------------------------
+    #Game Functions
+    #------------------------------------------------------------------------------------
             
-            if player == 1 and self.__current_player == -1:
-                self.__board[placement] = 0
-                self.__current_player = player
-                self.__game_started = True
+    def make_move(self, placement: int, player: int) -> bool:
+        """Function to make a move for a certain player with a given placement value. To make a move, it has to be that player's turn and the placement value be 0-8
 
-            elif player == -1 and self.__current_player == 1:
-                self.__board[placement] = 0
-                self.__current_player = player
-                self.__game_started = True
+        Args:
+            placement (int): 0-8 int value
+            player (int): 0, 1, or -1
 
+        Returns:
+            bool: True if the operation was successful
+        """
+        if self.__playable == False:
+            print('Game has not started')
+            return False
+        elif placement < 0 or placement >= 9:
+            print('Placement value of [{0}] is not allowed player {1}'.format(placement,player))
+            return False
+        elif player not in [self.__player_one, self.__player_two]:
+            print('{0} is a wrong value for player'.format(player))
+            return False
+        elif player != self.__current_player:
+            print('Player {0} can not make a move yet'.format(player))
+            return False
+
+        col = int(placement % self.__col_size)
+        row = int((placement-col)/self.__row_size)
+        
+        if self.is_empty(placement):
+            self.__board[row,col] = player
+            
+            if self.__current_player == self.__player_one:
+                self.__current_player = self.__player_two
+            elif self.__current_player == self.__player_two:
+                self.__current_player = self.__player_one
+            
+            return True
+        
+    def unmake_move(self, placement: int, player: int) -> bool:
+        """Function to unmake a certain move for a player given a placement value
+
+        Args:
+            placement (int): 0-8
+            player (int): 0, 1, -1. The player value can not be the current player
+
+        Returns:
+            bool: True if the operation was successful
+        """
+        if placement < 0 or placement >= 9:
+            print('Placement value of [{0}] is not allowed player {1}'.format(placement,player))
+            return False
+        elif player not in [self.__player_one, self.__player_two]:
+            print('{0} is a wrong value for player'.format(player))
+            return False
+        elif player == self.__current_player:
+            print('Player {0} can not unmake a move yet'.format(player))
+            return False
+
+        col = int(placement % self.__col_size)
+        row = int((placement-col)/self.__row_size)
+        
+        if self.__board[row,col] == player:
+            if player == self.__player_one and self.__current_player == self.__player_two:
+                self.__board[row,col] = 0
+                self.__current_player = player
+                self.__playable = True
+                
+            elif player == self.__player_two and self.__current_player == self.__player_one:
+                self.__board[row,col] = 0
+                self.__current_player = player
+                self.__playable = True
+                
             else:
                 print('Something went wrong')
                 return False
@@ -106,245 +200,130 @@ class TicTacToe:
             return True
         
         else:
-            print('Can not unmake that move.')
+            print('Can not unmake that move. Please try again')
             return False
 
-    def check_move(self,placement: int) -> bool:
-        """Function to check if a move is legal or not
-
-        Args:
-            placement (int): Index value
+    def check_game(self) -> int:
+        """Function to see if there is a winner. 
 
         Returns:
-            bool: True if the action was legal. False if the action was illegal
+            int: 0 for playable game, 1 for player one winning, -1 for player two winning, 2 for a tied game
         """
-        # Return true if the placement is empty
-        if self.__board[placement] == 0:
-            return True
+        #check all rows
+        for i in range(self.__row_size):
+            if (self.__board[i,:] == self.__player_one).all() or (self.__board[i,:] == self.__player_two).all():
+                self.__playable = False
+                return self.__board[i,0]
         
-        # Return false if the placement is not empty
-        return False
+        #check all columns
+        for i in range(self.__col_size):
+            if (self.__board[:,i] == self.__player_one).all() or (self.__board[:,i]== self.__player_two).all():
+                self.__playable = False
+                return self.__board[0,i]
+            
+        #check all diagonals
+        diagonal_one = np.array([self.__board[0,0], self.__board[1,1], self.__board[2,2]])
+        diagonal_two = np.array([self.__board[0,2], self.__board[1,1], self.__board[2,0]])
+
+        if (diagonal_one == self.__player_one).all() or (diagonal_one == self.__player_two).all():
+            self.__playable = False
+            return self.__board[1,1]
+        elif (diagonal_two == self.__player_one).all() or (diagonal_two == self.__player_two).all():
+            self.__playable = False
+            return self.__board[1,1]
+        
+        #check if there is a zero
+        if 0 in self.__board:
+            self.__playable = True
+            return 0
+        
+        #If non of the other checks happen, then it must be a tie    
+        self.__playable = False  
+        return 2
+        
+    #------------------------------------------------------------------------------------
+    #Display Functions
+    #------------------------------------------------------------------------------------
+     
+    def print_board(self) -> None:
+        """Print the board in a nice format
+        """
+        for row in range(self.__row_size):
+            line = ''
+
+            for col in range(self.__col_size):
+                if self.__board[row,col] == 0:
+                    line = line + '[-]'
+                elif self.__board[row,col] == self.__player_one:
+                    line = line + '[X]'
+                elif self.__board[row,col] == self.__player_two:
+                    line = line + '[O]'
+            
+            print(line)
+        print('')
+
+    #------------------------------------------------------------------------------------
+    #Getter Functions
+    #------------------------------------------------------------------------------------
     
-    #To check if a placement is empty
-    def is_empty(self, placement: int) -> bool:
-        """To check if a index value is empty or a value of 0
-
-        Args:
-            placement (int): Index value
+    def get_possible_moves(self) -> np.ndarray:
+        """Function to get all the possible placement value
 
         Returns:
-            bool: True if the value in placement index is 0, false if not
+            np.ndarray: _description_
         """
-        if placement<0 and placement>=9:
-            print("Wrong placement value")
-            return False
-        
-        if self.__board[placement] == 0:
-            return True
-        else:
-            return False
+        possible_moves = np.array([])
+        move_index = 0
 
-    def check_board(self) -> int:
-        """Function to check if there is a winner to Tic Tac Toe.
+        for row in range(self.__row_size):
+            for col in range(self.__col_size):
+                if self.__board[row,col] == 0:
+                    action_value = row*self.__row_size + col
+                    
+                    if possible_moves.size > move_index:
+                        possible_moves[move_index] = action_value
+                        move_index = move_index + 1
+                        
+                    else:
+                        possible_moves = np.insert(possible_moves, move_index, action_value)
+                        move_index = move_index + 1
+                        
+        return possible_moves
+    
+    def get_state_space(self) -> int:
+        """Function to give a certain board configuration a unique int value
 
         Returns:
-            int: 1 - player one wins, 2 - player two wins, 3 - tie, 0 - can still play
+            int: unique int vlaue for board configuration
         """
-        # Player one wins
-        if self.__board[0] == self.__player_one and self.__board[1] == self.__player_one and self.__board[2] == self.__player_one:
-            self.__game_started = False
-            return self.__player_one
-        elif self.__board[3] == self.__player_one and self.__board[4] == self.__player_one and self.__board[5] == self.__player_one:
-            self.__game_started = False
-            return self.__player_one
-        elif self.__board[6] == self.__player_one and self.__board[7] == self.__player_one and self.__board[8] == self.__player_one:
-            self.__game_started = False
-            return self.__player_one
-        elif self.__board[0] == self.__player_one and self.__board[3] == self.__player_one and self.__board[6] == self.__player_one:
-            self.__game_started = False
-            return self.__player_one
-        elif self.__board[1] == self.__player_one and self.__board[4] == self.__player_one and self.__board[7] == self.__player_one:
-            self.__game_started = False
-            return self.__player_one
-        elif self.__board[2] == self.__player_one and self.__board[5] == self.__player_one and self.__board[8] == self.__player_one:
-            self.__game_started = False
-            return self.__player_one
-        elif self.__board[0] == self.__player_one and self.__board[4] == self.__player_one and self.__board[8] == self.__player_one:
-            self.__game_started = False
-            return self.__player_one
-        elif self.__board[2] == self.__player_one and self.__board[4] == self.__player_one and self.__board[6] == self.__player_one:
-            self.__game_started = False
-            return self.__player_one
+        state_value = 0
         
-        # Player two wins
-        if self.__board[0] == self.__player_two and self.__board[1] == self.__player_two and self.__board[2] == self.__player_two:
-            self.__game_started = False
-            return self.__player_two
-        elif self.__board[3] == self.__player_two and self.__board[4] == self.__player_two and self.__board[5] == self.__player_two:
-            self.__game_started = False
-            return self.__player_two
-        elif self.__board[6] == self.__player_two and self.__board[7] == self.__player_two and self.__board[8] == self.__player_two:
-            self.__game_started = False
-            return self.__player_two
-        elif self.__board[0] == self.__player_two and self.__board[3] == self.__player_two and self.__board[6] == self.__player_two:
-            self.__game_started = False
-            return self.__player_two
-        elif self.__board[1] == self.__player_two and self.__board[4] == self.__player_two and self.__board[7] == self.__player_two:
-            self.__game_started = False
-            return self.__player_two
-        elif self.__board[2] == self.__player_two and self.__board[5] == self.__player_two and self.__board[8] == self.__player_two:
-            self.__game_started = False
-            return self.__player_two
-        elif self.__board[0] == self.__player_two and self.__board[4] == self.__player_two and self.__board[8] == self.__player_two:
-            self.__game_started = False
-            return self.__player_two
-        elif self.__board[2] == self.__player_two and self.__board[4] == self.__player_two and self.__board[6] == self.__player_two:
-            self.__game_started = False
-            return self.__player_two
-        
-        # Tied game
-        if 0 not in self.__board:
-            self.__game_started = False
-            return 3
-        
-        # Still empty slots
-        return 0
-
-    def display_board(self) -> None:
-        """Void function to display the int[9] array in a 3 by 3 matrix
-        """
-        if self.__board.size != 9:
-            print("Wrong __board size")
-
-        else:
-            output_string = ''
-            for i in range(0,self.__board_size):
+        for row in range(self.__row_size):
+            for col in range(self.__col_size):
+                placement_value = row*3 + col
+                if self.__board[row,col] == 0:
+                    state_value = (0b1 << placement_value) | state_value
                     
-                if self.__board[i] == 1:
-                    output_string = output_string + 'O'
-                
-                elif self.__board[i] == 0:
-                    output_string = output_string + '-'
+                elif self.__board[row,col] == self.__player_two:
+                    state_value = (0b1 << placement_value + 9) | state_value
                     
-                elif self.__board[i] == -1:
-                    output_string = output_string + 'X'
-                    
-                if i in [2,5,8]:
-                    output_string = output_string + '\n'
-                    
-            print(output_string)
-                
-
+        return state_value
+    
     def get_current_player(self) -> int:
         return self.__current_player
-
-    def get_board(self) -> np.ndarray:
-        """A deep copy function of the int[9] array
-
-        Returns:
-            int[9]: Deep copy of the int[9] array
-        """
-        return copy.deepcopy(self.__board)
-
-    def start_game(self,display=False) -> None:
-        """Function to start the game
-
-        Args:
-            display (bool, optional): Prints out who the first player is. Defaults to False.
-        """
-        self.__game_started = True
-        self.__current_player = np.random.choice([-1,1],1)
-        if display == True:
-            print('Player {0} is first'.format(self.__current_player))
-
-    def set_board_to(self, board: np.ndarray) -> None:
-        """Function to set the Tic Tac Toe to a certain board configuration
-
-        Args:
-            board (np.ndarray): board array
-        """
-        self.__board = copy.deepcopy(board)
-        
-    def set_first_player(self,first_player: int) -> bool:
-        """Function to set the first player
-
-        Args:
-            first_player (int): Player ID that you want to go first
-
-        Returns:
-            bool: True if it was successful
-        """
-        if first_player != self.__player_one or first_player != self.__player_two:
-            print('Wrong player ID values')
-            self.__current_player = 0
-            return False
-
-        else:
-            self.__current_player = first_player
-            return True
-    
-    def get_game_status(self) -> bool:
-        """Function to see if the game is going or not
-
-        Returns:
-            bool: True if the game is on, False if the game is not on
-        """
-        return self.__game_started
-
-    def cal_state_space(self) -> int:
-        """Function to calculate the state space using 18 bits. Bits 0-8 describes the placement of zeros. Bits 17-9 describes the placement of the players
-
-           Example:
-           [0 1 2]
-           [1 0 0]   => 0b001000100_010110001 == 34993
-           [2 0 1]
-
-        Returns:
-            int: value that will represent the board placement
-        """
-        temp_value = 0
-
-        for i in range(0,self.__board_size):
-            if self.__board[i] == 0:
-                temp_value = (0b1 << i) | temp_value
-
-            elif self.__board[i] == self.__player_two:
-                temp_value = (0b1 << i + 9) | temp_value
-
-        return temp_value
-
-    # def get_state_space(self) -> int:
-    #     """Function to get the value of the state space
-
-    #     Returns:
-    #         int: self.__state_value
-    #     """
-    #     self.cal_state_space()
-    #     return self.__state_value
-
-    def get_possible_actions(self) -> np.ndarray:
-        """Function to get all the possible placement values
-
-        Returns:
-            np.ndarray: array of all the possible placement values
-        """
-        move = np.array([])
-        move_index = 0
-        
-        for i in range(0, self.__board_size):
-            if self.__board[i] == 0:
-                if move.size > move_index:
-                    move[move_index] = i
-                    move_index = move_index + 1
-
-                else:
-                    move = np.insert(move,move_index,i)
-                    move_index = move_index + 1
-
-        return move
     
     def get_player_one(self) -> int:
         return self.__player_one
     
     def get_player_two(self) -> int:
         return self.__player_two
+    
+    def get_board(self) -> np.ndarray:
+        return copy.deepcopy(self.__board)
+    
+    def is_game_playable(self) -> bool:
+        return self.__playable
+
+
+        
+
