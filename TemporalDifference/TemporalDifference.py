@@ -43,6 +43,46 @@ class TemporalDifference:
         self.__state_values[current_state] = self.__state_values[current_state] + self.__alpha*(self.__rewards[next_state] + self.__gamma*(self.__state_values[next_state]) - self.__state_values[current_state])
     
     #------------------------------------------------------------------------------------
+    #Saving Functions
+    #------------------------------------------------------------------------------------
+    
+    def save_state_values(self, file_path: str) -> None:
+        with open(file_path, mode='w') as file:
+            file_writer = csv.writer(file,delimiter=',')
+            
+            for i in self.__state_values.keys():
+                value = [i, self.__state_values[i]]
+                file_writer.writerow(value)
+                
+    def save_rewards(self, file_path: str) -> None:
+        with open(file_path, mode='w') as file:
+            file_writer = csv.writer(file,delimiter=',')
+            
+            for i in self.__rewards.keys():
+                value = [i, self.__rewards[i]]
+                file_writer.writerow(value)
+    
+    #------------------------------------------------------------------------------------
+    #Loading Functions
+    #------------------------------------------------------------------------------------
+    
+    def load_state_values(self, file_path: str) -> None:
+        with open(file_path) as file:
+            file_reader = csv.reader(file, delimiter=',')
+            
+            for row in file_reader:
+                # print(row)
+                self.__state_values[int(row[0])] = int(row[1]) 
+                
+    def load_rewards(self, file_path: str) -> None:
+        with open(file_path) as file:
+            file_reader = csv.reader(file, delimiter=',')
+            
+            for row in file_reader:
+                # print(row)
+                self.__rewards[int(row[0])] = int(row[1])    
+    
+    #------------------------------------------------------------------------------------
     #Getter Functions
     #------------------------------------------------------------------------------------
        
