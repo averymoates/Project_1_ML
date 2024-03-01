@@ -19,22 +19,24 @@ class TemporalDifference:
     __alpha = 0
     __gamma = 0
     __max_states = 0
+    __initial_state_value = 0.0
     
-    def __init__(self, alpha: float, gamma: float) -> None:
+    def __init__(self, alpha: float, gamma: float, initial_state_value: float) -> None:
         self.__state_values = {}
         self.__rewards = {}
         self.__alpha = alpha
         self.__gamma = gamma
+        self.__initial_state_value = initial_state_value
         
         
     def temporal_difference(self, current_state: int, next_state: int, next_reward: float) -> None:
         #Add states to state values
         if current_state not in self.__state_values.keys():
-            self.__state_values[current_state] = float(0.0)
+            self.__state_values[current_state] = float(self.__initial_state_value)
             self.__max_states = self.__max_states + 1
             
         if next_state not in self.__state_values.keys():
-            self.__state_values[next_state] = float(0.0)
+            self.__state_values[next_state] = float(self.__initial_state_value)
             self.__max_states = self.__max_states + 1
             
         if next_state not in self.__rewards.keys():
