@@ -240,6 +240,36 @@ class TicTacToe:
         #If non of the other checks happen, then it must be a tie    
         self.__playable = False  
         return 2
+    
+    def check_game_RL(self) -> int:
+        #Check rows
+        for row in range(self.__row_size):
+            if np.sum(self.__board[row,:]) == self.__player_one*2:
+                return self.__player_one
+            elif np.sum(self.__board[row,:]) == self.__player_two*2:
+                return self.__player_two
+        #Check columns 
+        for col in range(self.__row_size):
+            if np.sum(self.__board[:,col]) == self.__player_one*2:
+                return self.__player_one
+            elif np.sum(self.__board[:,col]) == self.__player_two*2:
+                return self.__player_two
+        #Check diagonals
+        diagonal_one = np.sum([self.__board[0,0], self.__board[1,1], self.__board[2,2]])
+        diagonal_two = np.sum([self.__board[0,2], self.__board[1,1], self.__board[2,0]])
+
+        if diagonal_one == self.__player_one*2:
+            return self.__player_one
+        elif diagonal_one == self.__player_two*2:
+            return self.__player_two
+        
+        if diagonal_two == self.__player_one*2:
+            return self.__player_one
+        elif diagonal_two == self.__player_two*2:
+            return self.__player_two
+        
+        return 0
+        
         
     #------------------------------------------------------------------------------------
     #Display Functions

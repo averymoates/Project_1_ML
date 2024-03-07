@@ -1,4 +1,4 @@
-from TicTacToe import TicTacToe
+import TicTacToe.TicTacToe as ttt
 import sys
 import numpy as np
 
@@ -17,7 +17,7 @@ class alphabeta:
     def __init__(self):
         """Constructor
         """
-        self.__game = TicTacToe()
+        self.__game = ttt.TicTacToe()
         self.__max_depth = 3
 
     def alphabeta_make_move(self, board, depth: int, player: int) -> int:
@@ -33,7 +33,7 @@ class alphabeta:
         """
         self.__max_depth = depth
         #Setting everything up so that alpha beta works
-        game = TicTacToe()
+        game = ttt.TicTacToe()
         game.set_board_to(board)
         game.set_current_player_to(player)
         game.set_game_to_playable()
@@ -57,7 +57,7 @@ class alphabeta:
 
         return self.init_alphabeta(game,alpha,beta,maxPlayer,minPlayer)
     
-    def init_alphabeta(self, TTTgame: TicTacToe, alpha: int, beta: int, maxPlayer: int, minPlayer: int) -> int:
+    def init_alphabeta(self, TTTgame: ttt.TicTacToe, alpha: int, beta: int, maxPlayer: int, minPlayer: int) -> int:
         """The start of the Alpha-Beta algorithm
 
         Args:
@@ -93,7 +93,7 @@ class alphabeta:
                 
         return best_move
     
-    def alphabeta(self, TTTgame: TicTacToe, depth: int, alpha: int, beta: int, isMax: bool, maxPlayer: int, minPlayer: int) -> int:
+    def alphabeta(self, TTTgame: ttt.TicTacToe, depth: int, alpha: int, beta: int, isMax: bool, maxPlayer: int, minPlayer: int) -> int:
         """Recursive function of the alpha-beta algorithm
 
         Args:
@@ -143,7 +143,7 @@ class alphabeta:
                     
             return min_value
 
-    def evaluate_game(self, TTTgame: TicTacToe, maxPlayer: int, minPlayer: int) -> int:
+    def evaluate_game(self, TTTgame: ttt.TicTacToe, maxPlayer: int, minPlayer: int) -> int:
         """Function to calculate the score of the board. 0 if the board has no winner, a 1 for max player winning and additional 1 for each empty space, and a -1 for min player winning and additional -1 for each empty space
 
         Args:

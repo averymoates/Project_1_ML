@@ -20,6 +20,7 @@ class TemporalDifference:
     __gamma = 0
     __max_states = 0
     __initial_state_value = 0.0
+
     
     def __init__(self, alpha: float, gamma: float, initial_state_value: float) -> None:
         self.__state_values = {}
@@ -41,7 +42,7 @@ class TemporalDifference:
             
         if next_state not in self.__rewards.keys():
             self.__rewards[next_state] = float(next_reward)
-            
+ 
         self.__state_values[current_state] = self.__state_values[current_state] + self.__alpha*(self.__rewards[next_state] + self.__gamma*(self.__state_values[next_state]) - self.__state_values[current_state])
     
     #------------------------------------------------------------------------------------
@@ -73,16 +74,18 @@ class TemporalDifference:
             file_reader = csv.reader(file, delimiter=',')
             
             for row in file_reader:
-                # print(row)
-                self.__state_values[int(row[0])] = int(row[1]) 
+                if row == []:
+                    continue
+                self.__state_values[int(row[0])] = float(row[1]) 
                 
     def load_rewards(self, file_path: str) -> None:
         with open(file_path) as file:
             file_reader = csv.reader(file, delimiter=',')
             
             for row in file_reader:
-                # print(row)
-                self.__rewards[int(row[0])] = int(row[1])    
+                if row == []:
+                    continue
+                self.__rewards[int(row[0])] = float(row[1])    
     
     #------------------------------------------------------------------------------------
     #Getter Functions
@@ -93,8 +96,10 @@ class TemporalDifference:
     
     def get_state_value(self, state_space: int) -> float:
         if state_space not in self.__state_values.keys():
-            print('State space of [{0}] is not in known state spaces'.format(state_space))
-            return -100_000_000
+            # print('State space of [{0}] is not in known state spaces'.format(state_space))
+            self.__state_values[state_space] = float(self.__initial_state_value)
+            self.__max_states = self.__max_states + 1
+            return self.__state_values[state_space]
         else:
             return self.__state_values[state_space]
     
