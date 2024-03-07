@@ -2,8 +2,6 @@ import csv
 import numpy as np
 
 class QLearning():
-
-
     __alpha = 0
     __gamma = 0
 
@@ -63,5 +61,10 @@ class QLearning():
     def get_q_values(self) -> np.ndarray:
         return self.__q_values
     
-    def get_argmax_q(self, state: int) -> int:
-        return np.argmax(self.__q_values[state])
+    def get_argmax_q(self, state: int, possible_actions: np.ndarray) -> int:
+        
+        values = self.__q_values[state]
+        
+        max = np.argmax(values[possible_actions])
+        
+        return possible_actions[max]

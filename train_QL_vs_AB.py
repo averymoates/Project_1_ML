@@ -17,7 +17,7 @@ opponent = ab.alphabeta()
 agent = ql.QLearning(alpha,gamma,2**18,9)
 
 def main():
-    trials = [1,5,10,50,100,500]
+    trials = [1,5,10,50,100,500,1000,5000,10_000]
     
     for episodes in tqdm(trials):
         
@@ -45,7 +45,7 @@ def main():
                 elif current_player == game.get_player_two():
                     current_state_space = game.get_state_space()
                     current_updated = True
-                    possible_actions = game.get_possible_moves()
+                    possible_actions = np.array([int(i) for i in game.get_possible_moves()])
                     action = choose_action(current_state_space,possible_actions)
                     game.make_move(action,game.get_player_two())
 
@@ -74,7 +74,7 @@ def choose_action(current_state: int, possible_action: np.ndarray) -> int:
     if np.random.rand() < epsilon:
         a = np.random.choice(possible_action,1)
     else:
-        a = agent.get_argmax_q(current_state)
+        a = agent.get_argmax_q(current_state,possible_action)
 
     if np.random.rand() < 0.001:
         epsilon -= 0.0005
@@ -82,6 +82,9 @@ def choose_action(current_state: int, possible_action: np.ndarray) -> int:
     if epsilon < 0:
         epsilon = 0
 
+    if type(a) == np.ndarray:
+        a = int(a[0])
+        
     return a
 
 if __name__ == '__main__':
